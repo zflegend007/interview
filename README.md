@@ -2,13 +2,12 @@
 
 C/C++ 面试知识总结，只为复习、分享。部分知识点与图片来自网络，侵删。
 
-勘误请 Issue、Pull，新增请 Issue，建议、讨论请 [# issues/12](https://github.com/huihut/interview/issues/12)
+勘误新增请 Issue、PR，建议、讨论请 [#issues/12](https://github.com/huihut/interview/issues/12)，排版使用 [中文文案排版指北](https://github.com/mzlogin/chinese-copywriting-guidelines)
 
-## 使用建议
+使用建议：
 
 * `Ctrl + F`：快速查找定位知识点
-* `TOC 导航`：使用 [jawil/GayHub](https://github.com/jawil/GayHub) 插件快速目录跳转
-* `T`：按 `T` 激活文件查找器快速查找 / 跳转文件
+* `TOC 导航`：[jawil/GayHub](https://github.com/jawil/GayHub) 插件快速目录跳转
 
 ## 目录
 
@@ -122,7 +121,7 @@ int* const function7();     // 返回一个指向变量的常指针，使用：i
 * 相当于不用执行进入函数的步骤，直接执行函数体；
 * 相当于宏，却比宏多了类型检查，真正具有函数特性；
 * 不能包含循环、递归、switch 等复杂操作；
-* 类中除了虚函数的其他函数都会自动隐式地当成内联函数。
+* 在类声明中定义的函数，除了虚函数的其他函数都会自动隐式地当成内联函数。
 
 #### 使用
 
@@ -138,6 +137,17 @@ int functionName(int first, int secend,...);
 
 // 定义
 inline int functionName(int first, int secend,...) {/****/};
+
+// 类内定义，隐式内联
+class A {
+    int doA() { return 0; }         // 隐式内联
+}
+
+// 类外定义，需要显式内联
+class A {
+    int doA();
+}
+inline int A::doA() { return 0; }   // 需要显式内联
 ```
 
 </details>
@@ -219,11 +229,18 @@ int main()
 
 ### assert()
 
-断言，是宏，而非函数。assert 宏的原型定义在`<assert.h>`（C）、`<cassert>`（C++）中，其作用是如果它的条件返回错误，则终止程序执行。如：
+断言，是宏，而非函数。assert 宏的原型定义在 `<assert.h>`（C）、`<cassert>`（C++）中，其作用是如果它的条件返回错误，则终止程序执行。可以通过定义 `NDEBUG` 来关闭 assert，但是需要在源代码的开头，`include <assert.h>` 之前。
+
+<details><summary>assert() 使用</summary> 
 
 ```cpp
-assert( p != NULL );
+#define NDEBUG          // 加上这行，则 assert 不可用
+#include <assert.h>
+
+assert( p != NULL );    // assert 不可用
 ```
+
+</details>
 
 ### sizeof()
 
@@ -1161,7 +1178,7 @@ class doSomething(Flyable *obj)                 // 做些事情
 ### Effective C++
 
 1. 视 C++ 为一个语言联邦（C、Object-Oriented C++、Template C++、STL）
-2. 尽量以 `const`、`enum`、`inline` 替换 `#define`（宁可以编译器替换预处理器）
+2. 宁可以编译器替换预处理器（尽量以 `const`、`enum`、`inline` 替换 `#define`）
 3. 尽可能使用 const
 4. 确定对象被使用前已先被初始化（构造时赋值（copy 构造函数）比 default 构造后赋值（copy assignment）效率高）
 5. 了解 C++ 默默编写并调用哪些函数（编译器暗自为 class 创建 default 构造函数、copy 构造函数、copy assignment 操作符、析构函数）
@@ -1200,11 +1217,13 @@ class doSomething(Flyable *obj)                 // 做些事情
 
 ### Google C++ Style Guide
 
+> 英文：[Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)  
+> 中文：[C++ 风格指南](https://zh-google-styleguide.readthedocs.io/en/latest/google-cpp-styleguide/contents/)
 <details><summary>Google C++ Style Guide 图</summary>
 
-![Google C++ Style Guide](http://img.blog.csdn.net/20140713220242000)
+![Google C++ Style Guide](images/GoogleCppStyleGuide.png)
 
-> 图片来源于：[CSDN . 一张图总结Google C++编程规范(Google C++ Style Guide)](http://blog.csdn.net/voidccc/article/details/37599203)
+> 图片来源于：[CSDN . 一张图总结Google C++编程规范(Google C++ Style Guide)](https://blog.csdn.net/voidccc/article/details/37599203)
 
 </details>
 
@@ -1216,23 +1235,30 @@ class doSomething(Flyable *obj)                 // 做些事情
 
 ### 容器
 
-容器 | 底层数据结构 | 有无序 | 可不可重复 | 其他
----|---|---|---|---
-[array](https://github.com/huihut/interview/tree/master/STL#array)|数组|无序|可重复|支持快速随机访问
-[vector](https://github.com/huihut/interview/tree/master/STL#vector)|数组|无序|可重复|支持快速随机访问
-[list](https://github.com/huihut/interview/tree/master/STL#list)|双向链表|无序|可重复|支持快速增删
-[deque](https://github.com/huihut/interview/tree/master/STL#deque)|双端队列（一个中央控制器+多个缓冲区）|无序|可重复|支持首尾快速增删，支持随机访问
-[stack](https://github.com/huihut/interview/tree/master/STL#stack)|deque 或 list 封闭头端开口|无序|可重复|不用 vector 的原因应该是容量大小有限制，扩容耗时
-[queue](https://github.com/huihut/interview/tree/master/STL#queue)|deque 或 list 封闭底端出口和前端入口|无序|可重复|不用 vector 的原因应该是容量大小有限制，扩容耗时
-[priority_queue](https://github.com/huihut/interview/tree/master/STL#priority_queue)|vector|无序|可重复|vector容器+heap处理规则
-[set](https://github.com/huihut/interview/tree/master/STL#set)|红黑树|有序|不可重复|
-[multiset](https://github.com/huihut/interview/tree/master/STL#multiset)|红黑树|有序|可重复|
-[map](https://github.com/huihut/interview/tree/master/STL#map)|红黑树|有序|不可重复|
-[multimap](https://github.com/huihut/interview/tree/master/STL#multimap)|红黑树|有序|可重复|
-hash_set|hash表|无序|不可重复|
-hash_multiset|hash表|无序|可重复|
-hash_map|hash表|无序|不可重复|
-hash_multimap|hash表|无序|可重复|
+容器 | 底层数据结构 | 时间复杂度 | 有无序 | 可不可重复 | 其他
+---|---|---|---|---|---
+[array](https://github.com/huihut/interview/tree/master/STL#array)|数组|随机读改 O(1)|无序|可重复|支持快速随机访问
+[vector](https://github.com/huihut/interview/tree/master/STL#vector)|数组|随机读改、尾部插入、尾部删除 O(1)<br/>头部插入、头部删除 O(n)|无序|可重复|支持快速随机访问
+[list](https://github.com/huihut/interview/tree/master/STL#list)|双向链表|插入、删除 O(1)<br/>随机读改 O(n)|无序|可重复|支持快速增删
+[deque](https://github.com/huihut/interview/tree/master/STL#deque)|双端队列|头尾插入、头尾删除 O(1)|无序|可重复|一个中央控制器 + 多个缓冲区，支持首尾快速增删，支持随机访问
+[stack](https://github.com/huihut/interview/tree/master/STL#stack)|deque / list|顶部插入、顶部删除 O(1)|无序|可重复|deque 或 list 封闭头端开口，不用 vector 的原因应该是容量大小有限制，扩容耗时
+[queue](https://github.com/huihut/interview/tree/master/STL#queue)|deque / list|尾部插入、头部删除 O(1)|无序|可重复|deque 或 list 封闭头端开口，不用 vector 的原因应该是容量大小有限制，扩容耗时
+[priority_queue](https://github.com/huihut/interview/tree/master/STL#priority_queue)|vector + max-heap|插入、删除 O(log<sub>2</sub>n)|有序|可重复|vector容器+heap处理规则
+[set](https://github.com/huihut/interview/tree/master/STL#set)|红黑树|插入、删除、查找 O(log<sub>2</sub>n)|有序|不可重复|
+[multiset](https://github.com/huihut/interview/tree/master/STL#multiset)|红黑树|插入、删除、查找 O(log<sub>2</sub>n)|有序|可重复|
+[map](https://github.com/huihut/interview/tree/master/STL#map)|红黑树|插入、删除、查找 O(log<sub>2</sub>n)|有序|不可重复|
+[multimap](https://github.com/huihut/interview/tree/master/STL#multimap)|红黑树|插入、删除、查找 O(log<sub>2</sub>n)|有序|可重复|
+hash_set|哈希表|插入、删除、查找 O(1) 最差 O(n)|无序|不可重复|
+hash_multiset|哈希表|插入、删除、查找 O(1) 最差 O(n)|无序|可重复|
+hash_map|哈希表|插入、删除、查找 O(1) 最差 O(n)|无序|不可重复|
+hash_multimap|哈希表|插入、删除、查找 O(1) 最差 O(n)|无序|可重复|
+
+### 算法
+
+算法 | 底层算法 | 时间复杂度 | 可不可重复
+---|---|---|---
+[find](http://www.cplusplus.com/reference/algorithm/find/)|顺序查找|O(n)|可重复
+[sort](https://github.com/gcc-mirror/gcc/blob/master/libstdc++-v3/include/bits/stl_algo.h#L4808)|[内省排序](https://en.wikipedia.org/wiki/Introsort)|O(n*log<sub>2</sub>n)|可重复
 
 ## 数据结构
 
@@ -1664,8 +1690,6 @@ typedef struct BiTNode
 * 三维计算机图形
 * 最邻近搜索
 
-### 图
-
 ## 算法
 
 ### 排序
@@ -1676,7 +1700,7 @@ typedef struct BiTNode
 [选择排序](Algorithm/SelectionSort.h) | O(n<sup>2</sup>)|O(n<sup>2</sup>)|O(1)|数组不稳定、链表稳定
 [插入排序](Algorithm/InsertSort.h) | O(n<sup>2</sup>)|O(n<sup>2</sup>)|O(1)|稳定
 [快速排序](Algorithm/QuickSort.h) | O(n*log<sub>2</sub>n) |  O(n<sup>2</sup>) | O(log<sub>2</sub>n) | 不稳定
-[堆排序](Algorithm/HeapSort.cpp) | O(n*log<sub>2</sub>n)|O(n<sup>2</sup>)|O(1)|不稳定
+[堆排序](Algorithm/HeapSort.cpp) | O(n*log<sub>2</sub>n)|O(n*log<sub>2</sub>n)|O(1)|不稳定
 [归并排序](Algorithm/MergeSort.h) | O(n*log<sub>2</sub>n) | O(n*log<sub>2</sub>n)|O(n)|稳定
 [希尔排序](Algorithm/ShellSort.h) | O(n*log<sup>2</sup>n)|O(n<sup>2</sup>)|O(1)|不稳定
 [计数排序](Algorithm/CountSort.cpp) | O(n+m)|O(n+m)|O(n+m)|稳定
